@@ -40,6 +40,9 @@ type (
 		X, Y, Level int
 	}
 	TileCoordinateBound []TileCoordinate
+	TileCoordinateScope struct {
+		MinX, MaX, MinY, MaY, Level int
+	}
 )
 
 func NewTileCoord(projection TileProjection) *TileCoord {
@@ -130,6 +133,27 @@ func (t *TileCoord) WGS84ToWebMercatorTileBound(level int, coords []Coordinate) 
 	}
 	wg.Wait()
 	return bound
+}
+
+func (bound TileCoordinateBound) Scope() TileCoordinateScope {
+	if len(bound) < 2 {
+		return TileCoordinateScope{}
+	}
+	x1, y1 := bound[0].X, bound[0].Y
+	x2, y2 := bound[1].X, bound[1].Y
+
+	minX := getMin(x1, x2)
+	maxX := getMax(x1, x2)
+
+	maxY := getMax(y1, y2)
+	minY := getMin(y2, y1)
+	return TileCoordinateScope{
+		MinX:  minX,
+		MaX:   maxX,
+		MinY:  minY,
+		MaY:   maxY,
+		Level: bound[0].Level,
+	}
 }
 
 func (bound TileCoordinateBound) Expand(fn func(x, y, level int)) bool {
