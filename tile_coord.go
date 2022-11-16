@@ -77,16 +77,20 @@ func NewTileCoord(projection TileProjection) *TileCoord {
 }
 
 func (t *TileCoord) Resolution(level int) float64 {
-	max := 1 << level
+	max := 1 << (level - t.StartLevel)
 	return t.initialResolution / float64(max)
 }
 
-func (t *TileCoord) WebMercatorTile(c Coordinate, level int) TileCoordinate {
+func (t *TileCoord) CalcTileCoordinate(c Coordinate, level int) TileCoordinate {
 	var resp TileCoordinate
 	resp.X = int((c.X - t.OriX) / t.Resolution(level) / float64(t.TileSize))
 	resp.Y = int(math.Abs(t.OriY-c.Y) / t.Resolution(level) / float64(t.TileSize))
 	resp.Level = level
 	return resp
+}
+
+func (t *TileCoord) WebMercatorTile(c Coordinate, level int) TileCoordinate {
+	return t.CalcTileCoordinate(c, level)
 }
 
 func (t *TileCoord) WGS84ToWebMercatorTile(c Coordinate, level int) TileCoordinate {
@@ -108,6 +112,25 @@ func (t *TileCoord) WebMercatorTileBound(coords []Coordinate, level int) TileCoo
 			bound = append(bound, TileCoordinate{
 				X: cd.X,
 				Y: cd.Y,
+			})
+			return nil
+		})
+	}
+	wg.Wait()
+	return bound
+}
+
+func (t *TileCoord) WGS84TileBound(level int, coords []Coordinate) TileCoordinateBound {
+	bound := make([]TileCoordinate, 0, 2)
+	wg := errgroup.Group{}
+	for _, coord := range coords {
+		coordCopy := coord
+		wg.Go(func() error {
+			cd := t.CalcTileCoordinate(coordCopy, level)
+			bound = append(bound, TileCoordinate{
+				X:     cd.X,
+				Y:     cd.Y,
+				Level: level,
 			})
 			return nil
 		})

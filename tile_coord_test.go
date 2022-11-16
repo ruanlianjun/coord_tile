@@ -47,3 +47,21 @@ func TestTileCoord_WGS84ToWebMercatorTileBounds(t1 *testing.T) {
 	})
 
 }
+func TestTileCoord_WGS84TileBounds(t1 *testing.T) {
+	coord := NewTileCoord(TileProjWGS1984)
+
+	bound := coord.WGS84TileBound(4, []Coordinate{
+		{
+			//73.0821065143448, 53.560629756117
+			X: 73.0821065143448, Y: 53.560629756117,
+		},
+		{
+			//135.087067, 18.2143401996406
+			X: 135.087067, Y: 18.2143401996406,
+		},
+	})
+	fmt.Printf("bound:%+v\n", bound)
+	//x:6844 y:3358 level:13
+	//x:6845 y:3358 level:13
+
+}
