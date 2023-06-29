@@ -93,6 +93,7 @@ func (t *TileCoord) WebMercatorTile(c Coordinate, level int) TileCoordinate {
 	return t.CalcTileCoordinate(c, level)
 }
 
+// WGS84ToWebMercatorTile WGS84坐标转WebMercator坐标
 func (t *TileCoord) WGS84ToWebMercatorTile(c Coordinate, level int) TileCoordinate {
 	mercator := c.WGS84ToWebMercator()
 	var resp TileCoordinate
