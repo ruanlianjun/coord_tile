@@ -59,10 +59,10 @@ func NewTileCoord(projection TileProjection) *TileCoord {
 		ts.initialResolution = 0.703125
 		ts.TileUnit = Degree
 	case TileProjWebMercator, TileProjArcGIS:
-		ts.OriX = -20037508.342787
-		ts.OriY = 20037508.342787
+		ts.OriX = -2 * math.Pi * 6378137 / 2.0
+		ts.OriY = 2 * math.Pi * 6378137 / 2.0
 		ts.StartLevel = 0
-		ts.initialResolution = 156543.03392798
+		ts.initialResolution = 2 * math.Pi * 6378137 / float64(ts.TileSize)
 		ts.TileUnit = Meter
 	case TileProjBaidu:
 		ts.OriX = 0
